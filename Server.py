@@ -13,9 +13,8 @@ print("SERVER READY")
 
 def on_new_client(clientsocket, addr):
 
-    arquivos = clientsocket.recv(1024).decode('utf-8').split(';')
-    pares[addr[0]] = arquivos
-    clientsocket.send(str.encode(f'Bem vindo {addr[0]}'))
+    ip, arquivos = clientsocket.recv(1024).decode('utf-8').split(';')
+    pares[ip] = arquivos
 
     while True:
         message = clientsocket.recv(1024)
@@ -26,22 +25,22 @@ def on_new_client(clientsocket, addr):
 
         match message.split():
             case ['peers']:
-                totalPeers = ",".join(list(pares.keys()))
-                clientsocket.send(str.encode(f"Seus vizinhos são: {totalPeers}\n"))
-            case ['ls']:
-                ipArquivos = message.split()[1]
-                clientsocket.send(str.encode("Arquivos: \n" + json.dumps(pares[ipArquivos], indent=1)))
+                total_peers = ", ".join(list(pares.keys()))
+                clientsocket.send(str.encode(f"-> Seus vizinhos são: {total_peers}\n"))
+            case ['ls', _]:
+                ip_arquivos = message.split()[1]
+                clientsocket.send(str.encode("-> Arquivos: " + json.dumps(pares[ip_arquivos], indent=1)))
             case ['exit']:
-                pares.pop(addr[0])
+                print(ip)
+                pares.pop(ip)
                 clientsocket.close()
                 sys.exit()
             case _:
                 clientsocket.send(
-                    str.encode("Informe um dos seguintes comandos\n(peers, ls [ip], get [ip] [arquivo.txt])"))
+                    str.encode("-> Comando inválido \n(peers, ls [ip], get [ip] [arquivo.txt])"))
 
 
 while True:
     connectionSocket, addr = serverSocket.accept()
     _thread.start_new_thread(on_new_client, (connectionSocket, addr))
-    print(f'Conectado a {addr}')
 
