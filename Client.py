@@ -26,7 +26,7 @@ def server(serverName, port):
         _thread.start_new_thread(transferFiles, (connectionSocket, addr))
 
 def transferFiles():
-
+    pass
 
 if len(sys.argv) < 2:
     raise Exception("Informe IP arq1.txt")
