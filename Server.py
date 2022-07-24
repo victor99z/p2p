@@ -31,13 +31,15 @@ def on_new_client(clientsocket, addr):
                 ip_arquivos = message.split()[1]
                 clientsocket.send(str.encode("-> Arquivos: " + json.dumps(pares[ip_arquivos], indent=1)))
             case ['exit']:
-                print(ip)
                 pares.pop(ip)
                 clientsocket.close()
                 sys.exit()
+            case ['rm', _, _]:
+                # TODO: pqp fudeu
+                pass
             case _:
                 clientsocket.send(
-                    str.encode("-> Comando inválido \n(peers, ls [ip], get [ip] [arquivo.txt])"))
+                    str.encode("-> Comando inválido \n-> (peers, ls [ip], get [ip] [arquivo.txt]), exit"))
 
 
 while True:

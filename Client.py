@@ -1,8 +1,9 @@
 import _thread
 from random import randint
+from time import sleep
 from socket import *
+from tqdm import tqdm
 import sys
-import tqdm
 
 class Connection:
     def __init__(self, serverName, serverPort) -> None:
@@ -23,10 +24,26 @@ def server(serverName, port):
 
     while True:
         connectionSocket, addr = serverSocket.accept()
-        _thread.start_new_thread(transferFiles, (connectionSocket, addr))
 
-def transferFiles():
-    pass
+        msg = connectionSocket.recv(1024).decode('utf-8')
+
+        connectionSocket.send(f'pica->{msg}'.encode())
+
+
+def downloadFile(type, ip, file):
+    downloadServer = socket(AF_INET, SOCK_STREAM)
+    downloadServer.connect((ip, 5001))
+
+    downloadServer.send(f'{type};{ip};{file}'.encode())
+
+    callback = downloadServer.recv(1024).decode('utf-8')
+    print(callback)
+
+    for i in tqdm(range(int(9e6))):
+        pass
+
+    return 
+
 
 if len(sys.argv) < 2:
     raise Exception("Informe IP arq1.txt")
@@ -43,12 +60,11 @@ while True:
     client_message = sys.stdin.readline()
 
     match client_message.split():
-        case ["get", _]:
-            print("yikes get arquivo")
-            transferFiles()
+        case ["get", _, _]:
+            downloadFile(*client_message.split(), )
+            conn.clientSocket.send(str.encode("abuble"))
         case ["exit"]:
             conn.clientSocket.send(str.encode(client_message))
-            conn.clientSocket.close()
             sys.exit()
         case _:
             conn.clientSocket.send(str.encode(client_message))
