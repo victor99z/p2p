@@ -45,11 +45,15 @@ def downloadFile(type, ip, file):
     return 
 
 
-if len(sys.argv) < 2:
+if len(sys.argv) == 2:
     raise Exception("Informe IP arq1.txt")
 
 # Porta fixa 1234 do Server de pares
-conn = Connection(sys.argv[1], 1234)
+
+try:
+    conn = Connection(sys.argv[1], 1234)
+except Exception:
+    sys.exit()
 
 messageToSend = ipGenerator + ';' + ';'.join(sys.argv[2::])
 conn.clientSocket.send(f'{messageToSend}'.encode())

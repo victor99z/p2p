@@ -44,5 +44,6 @@ def on_new_client(clientsocket, addr):
 
 while True:
     connectionSocket, addr = serverSocket.accept()
+    print(f'Bem vindo {addr}')
     _thread.start_new_thread(on_new_client, (connectionSocket, addr))
 
