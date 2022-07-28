@@ -49,7 +49,7 @@ def downloadFile(type, ip, file):
 
     data = downloadSocket.recv(1024)
 
-    f = open('file', 'wb')
+    f = open(file, 'wb')
     while data != bytes(''.encode()):
         #print(data)
         data = downloadSocket.recv(1024)
@@ -79,7 +79,7 @@ while True:
     match client_message.split():
         case ["get", _, _]:
             downloadFile(*client_message.split(), )
-            conn.clientSocket.send(str.encode("get sucesses"))
+            conn.clientSocket.send(str.encode("get sucess"))
         case ["exit"]:
             conn.clientSocket.send(str.encode(client_message))
             sys.exit()

@@ -37,6 +37,8 @@ def on_new_client(clientsocket, addr):
             case ['rm', _, _]:
                 _, ip, arqName = message.split()
                 break
+            case ['get', 'sucess']:
+                print(":: Arquivo baixado!")
             case _:
                 clientsocket.send(
                     str.encode(":: Comando inválido \n-> (peers, ls [ip], get [ip] [arquivo.txt]), exit"))
