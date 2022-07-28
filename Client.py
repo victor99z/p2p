@@ -2,18 +2,26 @@ import _thread
 import sys
 import os
 from random import randint
-from time import sleep
 from socket import *
-from tqdm import tqdm
 from Peer import Peer
 
 
-# Simular os endereços
+if len(sys.argv) < 3:
+    raise Exception("Informe IP arq1.txt")
+
+# Porta fixa 1234 do Server de pares
+
+try:
+    conn = Peer(sys.argv[1], 1234)
+except Exception:
+    sys.exit()
+
+
+# Simular os endereços dentro da msm maquina
 # ipGenerator = f'127.0.0.{randint(5,100)}'
 
-# Não está funcionando direito para o Notebook pega (127.0.0.1) ao inves do 192....
-# ipGenerator = gethostbyname(gethostname())
-ipGenerator = Peer.getInternalIp()
+# IP interno caso use em outros PC's 
+ipGenerator = conn.clientSocket.getsockname()[0]
 
 print(ipGenerator)
 
@@ -35,11 +43,14 @@ def on_new_peer_transfer(peerSocket, addr):
 
     match msg.split(";"):
         case ['get', _]:
-            _, fileName = msg.split()
+            _, fileName = msg.split(";")
             filename_full = os.path.abspath(fileName)
-            Peer.sendFile(conn=peerSocket, file_name=filename_full, addr=addr)
 
-        
+            if (os.path.exists(filename_full)):
+                Peer.sendFile(conn=peerSocket, file_name=filename_full, addr=addr)
+            else:
+                peerSocket.send("error arquivo nao existe".encode())
+
 
 def downloadFile(type, ip, file):
     downloadSocket = socket(AF_INET, SOCK_STREAM)
@@ -49,24 +60,21 @@ def downloadFile(type, ip, file):
 
     data = downloadSocket.recv(1024)
 
-    f = open(file, 'wb')
-    while data != bytes(''.encode()):
-        #print(data)
-        data = downloadSocket.recv(1024)
-        f.write(data)
-
-    print(f':: Arquivo {file} em mãos')
+    match data.split():
+        case ["error"]:
+            print("Informe um arquivo existente!")
+            return
+        case _:
+            file = str(randint(0,100)) + file
     
+            f = open(file, 'wb')
+            while data != bytes(''.encode()):
+                #print(data)
+                data = downloadSocket.recv(1024)
+                f.write(data)
 
-if len(sys.argv) < 3:
-    raise Exception("Informe IP arq1.txt")
-
-# Porta fixa 1234 do Server de pares
-
-try:
-    conn = Peer(sys.argv[1], 1234)
-except Exception:
-    sys.exit()
+            print(f':: Arquivo {file} em mãos')
+    
 
 messageToSend = ipGenerator + ';' + ';'.join(sys.argv[2::])
 conn.clientSocket.send(f'{messageToSend}'.encode())
@@ -78,8 +86,9 @@ while True:
 
     match client_message.split():
         case ["get", _, _]:
-            downloadFile(*client_message.split(), )
-            conn.clientSocket.send(str.encode("get sucess"))
+            tipo, ip, filename = client_message.split()
+            downloadFile(tipo, ip, filename)
+            conn.clientSocket.send(str.encode(f'add {ipGenerator} {filename}'))
         case ["exit"]:
             conn.clientSocket.send(str.encode(client_message))
             sys.exit()

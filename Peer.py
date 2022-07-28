@@ -1,5 +1,4 @@
 from socket import *
-from tqdm import tqdm
 
 class Peer:
     def __init__(self, serverName, serverPort) -> None:
@@ -8,21 +7,12 @@ class Peer:
 
     @staticmethod
     def sendFile(file_name, conn, addr):
-        # progress = tqdm.tqdm(range(size), f"Sending {file_name}", unit="B", unit_scale=True, unit_divisor=1024)
         
         with open(file_name, 'rb') as file:
             data = file.read(1024)
             conn.send(data)
-            while len(data) > 0:
+            while data != bytes(''.encode()):
                 data = file.read(1024)
                 conn.send(data)
-                
-            # progress.update(1024)
-
-    @staticmethod
-    def getInternalIp():
-        s = socket(AF_INET, SOCK_DGRAM)
-        s.connect(('8.8.8.8', 80))
-        ip = s.getsockname()[0]
-        s.close()
-        return ip
+            
+        conn.close()

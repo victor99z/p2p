@@ -34,14 +34,13 @@ def on_new_client(clientsocket, addr):
                 pares.pop(ip)
                 clientsocket.close()
                 sys.exit()
-            case ['rm', _, _]:
-                _, ip, arqName = message.split()
-                break
-            case ['get', 'sucess']:
-                print(":: Arquivo baixado!")
+            case ['add', _, _]:
+                _, ip, filename = message.split()
+                pares[ip] = pares[ip].append(filename)
+                clientsocket.send(str.encode(":: Arquivo adicionado a lista"))
             case _:
                 clientsocket.send(
-                    str.encode(":: Comando inválido \n-> (peers, ls [ip], get [ip] [arquivo.txt]), exit"))
+                    str.encode(":: Comando inválido \n-> (peers, ls [ip], get [ip] [arquivo.txt], exit)"))
 
 
 while True:
