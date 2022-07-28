@@ -33,7 +33,7 @@ def on_new_peer_transfer(peerSocket, addr):
 
     peerSocket.send(f'::DEBUG:: {msg}'.encode())
 
-    match msg.split():
+    match msg.split(";"):
         case ['get', _]:
             _, fileName = msg.split()
             filename_full = os.path.abspath(fileName)
@@ -45,7 +45,7 @@ def downloadFile(type, ip, file):
     downloadSocket = socket(AF_INET, SOCK_STREAM)
     downloadSocket.connect((ip, 5001))
 
-    downloadSocket.send(f'{type};{ip};{file}'.encode())
+    downloadSocket.send(f'{type};{file}'.encode())
 
     data = downloadSocket.recv(1024)
 
