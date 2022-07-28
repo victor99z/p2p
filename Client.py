@@ -9,10 +9,11 @@ from Peer import Peer
 
 
 # Simular os endereços
-ipGenerator = f'127.0.0.{randint(5,100)}'
+# ipGenerator = f'127.0.0.{randint(5,100)}'
 
-# Hr que for rodar entre pcs mesmo
+# Não está funcionando direito para o Notebook pega (127.0.0.1) ao inves do 192....
 # ipGenerator = gethostbyname(gethostname())
+ipGenerator = Peer.getInternalIp()
 
 print(ipGenerator)
 
