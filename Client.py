@@ -36,8 +36,8 @@ def on_new_peer_transfer(peerSocket, addr):
     match msg.split():
         case ['get', _]:
             _, fileName = msg.split()
-            os.path.abspath(fileName)
-            Peer.sendFile(conn=peerSocket, file_name=fileName, addr=addr)
+            filename_full = os.path.abspath(fileName)
+            Peer.sendFile(conn=peerSocket, file_name=filename_full, addr=addr)
 
         
 
