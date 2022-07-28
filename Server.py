@@ -2,12 +2,13 @@ import json
 import _thread
 import sys
 from socket import *
+from typing import Dict
 
 serverPort = 1234
 serverSocket = socket(AF_INET, SOCK_STREAM)
-serverSocket.bind(('192.168.1.9', serverPort))
+serverSocket.bind(('192.168.1.11', serverPort))
 serverSocket.listen(5)
-pares = {}
+pares: Dict[str, list] = {}
 print("SERVER READY")
 
 
@@ -36,11 +37,18 @@ def on_new_client(clientsocket, addr):
                 sys.exit()
             case ['add', _, _]:
                 _, ip, filename = message.split()
-                pares[ip] = pares[ip].append(filename)
+                pares[ip].append(filename)
                 clientsocket.send(str.encode(":: Arquivo adicionado a lista"))
+            case ['rm', _, _]:
+                _, ip, filename = message.split()
+                if filename in pares[ip]:
+                    pares[ip].remove(filename)
+                    clientsocket.send(str.encode(":: Arquivo removido da lista"))
+                else:
+                    clientsocket.send(str.encode(":: Arquivo não encontrado"))
             case _:
                 clientsocket.send(
-                    str.encode(":: Comando inválido \n-> (peers, ls [ip], get [ip] [arquivo.txt], exit)"))
+                    str.encode(":: Comando inválido (peers, ls [ip], get [ip] [arquivo.txt], exit)"))
 
 
 while True:

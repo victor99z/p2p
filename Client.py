@@ -18,10 +18,10 @@ except Exception:
 
 
 # Simular os endereços dentro da msm maquina
-# ipGenerator = f'127.0.0.{randint(5,100)}'
+ipGenerator = f'127.0.0.{randint(5,100)}'
 
 # IP interno caso use em outros PC's 
-ipGenerator = conn.clientSocket.getsockname()[0]
+#ipGenerator = conn.clientSocket.getsockname()[0]
 
 print(ipGenerator)
 
@@ -62,14 +62,14 @@ def downloadFile(type, ip, file):
 
     match data.split():
         case ["error"]:
-            print("Informe um arquivo existente!")
-            return
+            print("Arquivo inexistente!")
+            conn.clientSocket.send(str.encode('exit'))
+            sys.exit()
         case _:
             file = str(randint(0,100)) + file
     
             f = open(file, 'wb')
             while data != bytes(''.encode()):
-                #print(data)
                 data = downloadSocket.recv(1024)
                 f.write(data)
 
